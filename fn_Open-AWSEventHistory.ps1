@@ -11,6 +11,9 @@ function Open-AWSEventHistory
 
   Requirements: 
     Logged into AWS into the correct Role for the browser where the url will be launched.
+  
+  Can use alias as well. For example using ff as an alias to launch FireFox
+  New-Alias -Scope global -Name ff -Value "C:\Program Files (x86)\Mozilla Firefox\firefox.exe"
 
 .EXAMPLE
   Open-AWSEventHistory -InstanceId i-04e833d2102fa63d6 -After 2020-03-04
@@ -24,7 +27,9 @@ Param (
     #Logs after this time. Default is 24 hours ago.
     [datetime]$After = $((Get-Date).AddDays(-1)),
     #Logs before this time. Default is now.
-    [datetime]$Before = $(Get-Date)
+    [datetime]$Before = $(Get-Date),
+    #The Browser to launch. Defaults to ff alias (for Firefox)
+    [string]$BrowserPath="ff"
 )
 
 Begin
@@ -34,6 +39,20 @@ Begin
     Write-Verbose "[INFO] $($StartTime)"
     $endTime = ($Before | Get-Date).ToUniversalTime() | Get-Date -UFormat "%Y-%m-%dT%H:%M:%S.000Z"
     Write-Verbose "[INFO] $($endTime)"
+
+    #if a path has been given, create a new alias for use
+    if (Test-Path $BrowserPath)
+    {
+        Write-Verbose "[INFO] Creating temporary alias"
+        New-Alias -Scope local -Name Browser -Value $BrowserPath
+    }
+
+    #if an alias has been passed, remap
+    if(Get-Alias $BrowserPath -ErrorAction SilentlyContinue)
+    {
+        Write-Verbose "[INFO] Duplicating alias for internal use"
+        New-Alias -Scope local -Name Browser -Value (Get-Alias $BrowserPath).Definition
+    }
   
 }#end Begin
 
@@ -41,9 +60,7 @@ Process
 {
     foreach ($instance in $InstanceId)
     {
-    #launch in firefox
-    #New-Alias -Scope global -Name ff -Value "C:\Program Files (x86)\Mozilla Firefox\firefox.exe"
-    ff "https://$($Region).console.aws.amazon.com/cloudtrail/home?region=$($Region)#/events?ResourceName=$($instance)&StartTime=$($startTime)&EndTime=$($endTime)"
+    Browser "https://$($Region).console.aws.amazon.com/cloudtrail/home?region=$($Region)#/events?ResourceName=$($instance)&StartTime=$($startTime)&EndTime=$($endTime)"
 
     }#end foreach
 }#end Process block
