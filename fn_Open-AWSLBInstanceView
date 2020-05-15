@@ -1,0 +1,63 @@
+function Open-AWSLBInstanceView
+{
+<#
+.SYNOPSIS
+  For an AWS Load Balancer resource name open a web browser to the Instance View.
+.DESCRIPTION
+  Opens a web browser to the supplied AWS Load Balancer name or DNS Name to the Load Balancer Instance View
+.NOTES
+  Example: AWS LB Instance View url
+  https://<region>.console.aws.amazon.com/ec2/v2/home?region=<region>#LoadBalancers:search=<name>;sort=loadBalancerName
+  https://<region>.console.aws.amazon.com/ec2/v2/home?region=<region>#LoadBalancers:search=<name>,<name>;sort=loadBalancerName
+
+  Requirements: 
+    Logged into AWS into the correct Role for the browser where the url will be launched.
+  
+  Can use alias as well. For example using ff as an alias to launch FireFox
+  New-Alias -Scope global -Name ff -Value "C:\Program Files (x86)\Mozilla Firefox\firefox.exe"
+
+.EXAMPLE
+  Open-AWSLBInstanceView -Name myApp-LB01
+#>
+Param (
+    #The Name and or DNS Name(s) to open
+    [Parameter(Mandatory,ValueFromPipeline,Position=0)]
+    [Alias("DNSName")]
+    [string[]]$Name,
+    #AWS Region to open. Default is ap-southeast-2
+    [string]$Region = "ap-southeast-2",
+    #The Browser to launch. Defaults to ff alias (for Firefox)
+    [string]$BrowserPath="ff"
+)
+
+Begin
+{
+    #if a path has been given, create a new alias for use
+    if (Test-Path $BrowserPath)
+    {
+        Write-Verbose "[INFO] Creating temporary alias"
+        New-Alias -Scope local -Name Browser -Value $BrowserPath
+    }
+
+    #if an alias has been passed, remap
+    if(Get-Alias $BrowserPath -ErrorAction SilentlyContinue)
+    {
+        Write-Verbose "[INFO] Duplicating alias for internal use"
+        New-Alias -Scope local -Name Browser -Value (Get-Alias $BrowserPath).Definition
+    }
+  
+}
+
+Process
+{
+    $searchName = $Name -join ","
+    Browser "https://$($Region).console.aws.amazon.com/ec2/v2/home?region=$($Region)#LoadBalancers:search=$($searchName);sort=loadBalancerName"
+
+}#end Process block
+
+End
+{
+    
+}
+
+}
