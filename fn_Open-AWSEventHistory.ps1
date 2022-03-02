@@ -17,10 +17,22 @@ function Open-AWSEventHistory
 
 .EXAMPLE
   Open-AWSEventHistory -InstanceId i-04e833d2102fa63d6 -After 2020-03-04
+
+    [Parameter(ParameterSetName='Name',
+            Mandatory=$true,
+            ValueFromPipeline=$true,
+            ValueFromPipelineByPropertyName=$true,
+            Position=0)]
 #>
+
+
 Param (
     #The Instance Id(s) to open
-    [Parameter(Mandatory,ValueFromPipeline,Position=0)]
+    [Parameter(Mandatory,
+        ValueFromPipeline,
+        ValueFromPipelineByPropertyName,
+        Position=0)]
+    [Alias("CloudId")]
     [string[]]$InstanceId,
     #AWS Region to open. Default is ap-southeast-2
     [string]$Region = "ap-southeast-2",
@@ -28,8 +40,8 @@ Param (
     [datetime]$After = $((Get-Date).AddDays(-1)),
     #Logs before this time. Default is now.
     [datetime]$Before = $(Get-Date),
-    #The Browser to launch. Defaults to ff alias (for Firefox)
-    [string]$BrowserPath="ff"
+    #The Browser to launch. Defaults to ch alias (for Chrome)
+    [string]$BrowserPath="ch"
 )
 
 Begin
@@ -54,20 +66,20 @@ Begin
         New-Alias -Scope local -Name Browser -Value (Get-Alias $BrowserPath).Definition
     }
   
-}#end Begin
+}
 
 Process
 {
     foreach ($instance in $InstanceId)
     {
-    Browser "https://$($Region).console.aws.amazon.com/cloudtrail/home?region=$($Region)#/events?ResourceName=$($instance)&StartTime=$($startTime)&EndTime=$($endTime)"
+        Browser "https://$($Region).console.aws.amazon.com/cloudtrail/home?region=$($Region)#/events?ResourceName=$($instance)&StartTime=$($startTime)&EndTime=$($endTime)"
 
-    }#end foreach
-}#end Process block
+    }
+}
 
 End
 {
     
-}#end end
+}
 
-}#end function
+}
