@@ -22,13 +22,16 @@ function Open-AWSEC2InstanceView
 #>
 Param (
     #The Resource Name and or Instance Id(s) to open
-    [Parameter(Mandatory,ValueFromPipeline,Position=0)]
-    [Alias("InstanceId","ResourceName")]
+    [Parameter(Mandatory,
+        ValueFromPipeline,
+        ValueFromPipelineByPropertyName,
+        Position=0)]
+    [Alias("CloudId","InstanceId","ResourceName")]
     [string[]]$Name,
     #AWS Region to open. Default is ap-southeast-2
     [string]$Region = "ap-southeast-2",
-    #The Browser to launch. Defaults to ff alias (for Firefox)
-    [string]$BrowserPath="ff"
+    #The Browser to launch. Defaults to ch alias (for Chrome)
+    [string]$BrowserPath="ch"
 )
 
 Begin
@@ -54,7 +57,7 @@ Process
     $searchName = $Name -join ","
     Browser "https://$($Region).console.aws.amazon.com/ec2/v2/home?region=$($Region)#Instances:search=$($searchName);sort=tag:Name"
 
-}
+}#end Process block
 
 End
 {
@@ -62,3 +65,4 @@ End
 }
 
 }
+
