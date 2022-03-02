@@ -18,11 +18,6 @@ function Open-AWSEventHistory
 .EXAMPLE
   Open-AWSEventHistory -InstanceId i-04e833d2102fa63d6 -After 2020-03-04
 
-    [Parameter(ParameterSetName='Name',
-            Mandatory=$true,
-            ValueFromPipeline=$true,
-            ValueFromPipelineByPropertyName=$true,
-            Position=0)]
 #>
 
 
@@ -73,7 +68,6 @@ Process
     foreach ($instance in $InstanceId)
     {
         Browser "https://$($Region).console.aws.amazon.com/cloudtrail/home?region=$($Region)#/events?ResourceName=$($instance)&StartTime=$($startTime)&EndTime=$($endTime)"
-
     }
 }
 
